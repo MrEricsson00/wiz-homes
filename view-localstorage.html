@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WIZ HOMES - Local Storage Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        h1 span {
+            color: #dc2626;
+        }
+        .subtitle {
+            color: #71717a;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 40px;
+        }
+        .section {
+            background: #27272a;
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid #3f3f46;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+        }
+        .badge {
+            background: #dc2626;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .data-card {
+            background: #18181b;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #3f3f46;
+            transition: all 0.3s ease;
+        }
+        .data-card:hover {
+            border-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.2);
+        }
+        .data-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #71717a;
+            margin-bottom: 8px;
+        }
+        .data-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            word-break: break-word;
+        }
+        .data-value.price {
+            color: #dc2626;
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        .data-value.rating {
+            color: #facc15;
+        }
+        .amenities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .amenity-tag {
+            background: #3f3f46;
+            color: #a1a1aa;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .gallery-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .gallery-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #3f3f46;
+            flex-shrink: 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #71717a;
+        }
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            color: #a1a1aa;
+        }
+        .empty-state p {
+            font-size: 0.875rem;
+            color: #71717a;
+        }
+        .refresh-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .refresh-btn:hover {
+            background: #b91c1c;
+            transform: scale(1.05);
+        }
+        .clear-btn {
+            background: #3f3f46;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 12px;
+        }
+        .clear-btn:hover {
+            background: #52525b;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .json-view {
+            background: #18181b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+            overflow-x: auto;
+            border: 1px solid #3f3f46;
+        }
+        .json-view pre {
+            color: #a1a1aa;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .json-key {
+            color: #dc2626;
+        }
+        .json-string {
+            color: #4ade80;
+        }
+        .json-number {
+            color: #facc15;
+        }
+        .json-boolean {
+            color: #38bdf8;
+        }
+        .json-null {
+            color: #71717a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WIZ <span>HOMES</span></h1>
+        <p class="subtitle">Local Storage Data Viewer</p>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Rooms Data</h2>
+                <span class="badge" id="room-count">0 rooms</span>
+            </div>
+            <div id="rooms-container" class="data-grid"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Raw JSON Data</h2>
+            </div>
+            <div class="json-view">
+                <pre id="json-output"></pre>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="refresh-btn" onclick="loadData()">Refresh Data</button>
+            <button class="clear-btn" onclick="clearStorage()">Clear Storage</button>
+        </div>
+    </div>
+
+    <script>
+        function loadData() {
+            const roomsData = localStorage.getItem('wiz_rooms');
+            const roomsContainer = document.getElementById('rooms-container');
+            const roomCount = document.getElementById('room-count');
+            const jsonOutput = document.getElementById('json-output');
+
+            if (!roomsData) {
+                roomsContainer.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 8v13H3V8"/>
+                            <path d="M1 3h22v5H1z"/>
+                            <path d="M10 12h4"/>
+                        </svg>
+                        <h3>No Data Found</h3>
+                        <p>No rooms data found in local storage. Visit the Rooms page to load data.</p>
+                    </div>
+                `;
+                roomCount.textContent = '0 rooms';
+                jsonOutput.textContent = 'No data in localStorage';
+                return;
+            }
+
+            try {
+                const rooms = JSON.parse(roomsData);
+                roomCount.textContent = `${rooms.length} rooms`;
+
+                // Display room cards
+                roomsContainer.innerHTML = rooms.map(room => `
+                    <div class="data-card">
+                        <div class="data-label">Room Name</div>
+                        <div class="data-value">${room.name || 'N/A'}</div>
+                        
+                        <div class="data-label" style="margin-top: 16px;">Price</div>
+                        <div class="data-value price">$${room.price || 0}/day</div>
+                        
+                        <div class="data-label" style="margin-top: 16px;">Rating</div>
+                        <div class="data-value rating">★ ${room.rating || 0}</div>
+                        
+                        <div class="data-label" style="margin-top: 16px;">Location</div>
+                        <div class="data-value">${room.location || 'N/A'}</div>
+                        
+                        <div class="data-label" style="margin-top: 16px;">ID</div>
+                        <div class="data-value" style="font-size: 0.875rem; color: #71717a;">${room.id || 'N/A'}</div>
+                        
+                        ${room.amenities && room.amenities.length > 0 ? `
+                            <div class="data-label" style="margin-top: 16px;">Amenities</div>
+                            <div class="amenities-list">
+                                ${room.amenities.map(amenity => `<span class="amenity-tag">${amenity}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${room.gallery && room.gallery.length > 0 ? `
+                            <div class="data-label" style="margin-top: 16px;">Gallery (${room.gallery.length} images)</div>
+                            <div class="gallery-preview">
+                                ${room.gallery.slice(0, 5).map(img => `<img src="${img}" class="gallery-thumb" alt="Gallery image">`).join('')}
+                                ${room.gallery.length > 5 ? `<span class="amenity-tag">+${room.gallery.length - 5} more</span>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+                // Display raw JSON
+                jsonOutput.innerHTML = syntaxHighlight(JSON.stringify(rooms, null, 2));
+            } catch (error) {
+                roomsContainer.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <h3>Error Parsing Data</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                roomCount.textContent = 'Error';
+                jsonOutput.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function clearStorage() {
+            if (confirm('Are you sure you want to clear all WIZ HOMES data from local storage?')) {
+                localStorage.removeItem('wiz_rooms');
+                loadData();
+            }
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
